@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <!--
+        MyBatis核心配置文件中，标签的顺序：
+        properties?,settings?,typeAliases?,typeHandlers?,
+        objectFactory?,objectWrapperFactory?,reflectorFactory?,
+        plugins?,environments?,databaseIdProvider?,mappers?
+    -->
+
+    <!--引入外部资源文件-->
+    <properties resource="jdbc.properties"></properties>
+    <settings>
+        <!--配置表中字段_字段映射java驼峰属性-->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <!--开启延迟加载-->
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <!--按需求延迟加载-->
+        <setting name="aggressiveLazyLoading" value="false"/>
+    </settings>
+    <!-- 类型别名：减少返回类型的编写长度-->
+    <typeAliases>
+        <!--为单个类型取别名: 在sql操作中返回类型就可以直接写别名 无需 包.类；无alias 则别名为默认类名 不区分大小写-->
+<!--        <typeAlias type="org.ssm.entity.User" alias="User"></typeAlias>-->
+        <!--对整个包下的实体类取别名，默认别名 为类的名字，不区分大小写-->
+        <package name="org.ssm.entity"/>
+    </typeAliases>
+
+    <!--设置连接数据库的环境-->
+    <!--environments 配置多个数据库连接的环境;default 设置默认使用的环境id-->
+    <environments default="development">
+        <!--配置具体的某个环境，id为环境的唯一标识-->
+        <environment id="development">
+            <!--设置事务管理方式
+                type = JDBC
+                type = JDBC：当前环境执行sql时，使用的时JDBC原生事务的管理方式，事务提交时手动的，回滚也一样
+                type = MANAGED:托管于其他组件 比如Spring AOP的事务
+            -->
+            <transactionManager type="JDBC"/>
+            <!--
+                dataSource：配置数据源
+                属性：
+                type：设置数据源的类型
+                type="POOLED|UNPOOLED|JNDI"
+                POOLED：表示使用数据库连接池缓存数据库连接
+                UNPOOLED：表示不使用数据库连接池
+                JNDI：表示使用上下文中的数据源
+               -->
+            <dataSource type="POOLED">
+                <property name="driver" value="${jdbc.driver}"/>
+                <property name="url" value="${jdbc.url}"/>
+                <property name="username" value="${jdbc.username}"/>
+                <property name="password" value="${jdbc.password}"/>
+            </dataSource>
+        </environment>
+
+        <environment id="test">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.cj.jdbc.Driver"/>
+                <property name="url"
+                          value="jdbc:mysql://localhost:3306/ssmserverTimezone=UTC"/>
+                <property name="username" value="root"/>
+                <property name="password" value="123456"/>
+            </dataSource>
+        </environment>
+
+    </environments>
+    <!--引入映射文件-->
+    <mappers>
+        <!--配置单个映射文件，当映射文件太多的时候就可以使用直接引入整个包下面的所有-->
+        <!--        <mapper resource="mapper/UserMapper.xml"/>-->
+
+        <!--引入某一个包下面的所有映射文件有两个前提条件
+        1.映射文件的位置必须和对应接口的位置一样，同一个包下
+        2.映射文件的名字必须和对应接口的名字保保持一致-->
+       <package name="org/ssm/dao"/>
+    </mappers>
+</configuration>

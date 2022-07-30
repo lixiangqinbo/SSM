@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.ssm.dao.UserMapper">
+    <insert id="saveUser">
+        INSERT INTO user VALUES (null,'admin','123456','12345@qq.com','男')
+    </insert>
+    <update id="updateUser">
+        UPDATE user SET password = '123'  WHERE id = 1
+    </update>
+    <delete id="deleteUser">
+        DELETE FROM user WHERE id = 1;
+    </delete>
+    <select id="getUserById" resultType="User">
+        SELECT id,userName,password,email,gender FROM user WHERE id = 2
+    </select>
+    <select id="getAllUser" resultType="User">
+        SELECT id,userName,password,email,gender FROM user
+    </select>
+<!--    User checkLogin1(String userNam);-->
+    <select id="checkLogin1" resultType="User">
+        SELECT id,userName,password,email,gender FROM user WHERE userName = #{userName}
+<!--         SELECT id,userName,password,email,gender FROM user WHERE userName = '${userName}' -->
+        </select>
+<!--    User checkLogin2(String userName,String password);-->
+    <select id="checkLogin2" resultType="User">
+        SELECT id,userName,password,email,gender FROM user WHERE userName = #{arg0} AND password = #{arg1}
+<!--         SELECT id,userName,password,email,gender FROM user WHERE userName = '${arg0}' AND password = '${arg1}' -->
+        </select>
+    <!--    User checkLogin3(Map<String,Object> map);-->
+    <select id="checkLogin3" resultType="User">
+         SELECT id,userName,password,email,gender FROM user WHERE userName = #{userName} AND password = #{password}
+    <!--         SELECT id,userName,password,email,gender FROM user WHERE userName = '${userName}' AND password = '${password}' -->
+        </select>
+    <!--    User checkLogin4(User user);-->
+    <select id="checkLogin4" resultType="User">
+         SELECT id,userName,password,email,gender FROM user WHERE userName = #{userName} AND password = #{password}
+    <!--         SELECT id,userName,password,email,gender FROM user WHERE userName = '${userName}' AND password = '${password}' -->
+        </select>
+    <!--    User checkLogin5(@Param("userName") String userName, @Param("password")String password);-->
+    <select id="checkLogin5" resultType="User" >
+         SELECT id,userName,password,email,gender FROM user WHERE userName = #{userName} AND password = #{password}
+<!--         SELECT id,userName,password,email,gender FROM user WHERE userName = ${userName} AND password = ${password} -->
+    </select>
+<!--    Map getUserMap(@Param("userName") String userName, @Param("password")String password)-->
+    <select id="getUserMap" resultType="Map">
+        SELECT id,userName,password,email,gender FROM user WHERE userName = #{userName} AND password = #{password}
+    </select>
+<!--    List<Map<String,Object>> getAllUserListMap-->
+    <select id="getAllUserListMap" resultType="Map">
+        SELECT id,userName,password,email,gender FROM user
+    </select>
+<!--    Map getAllUserMap()-->
+    <select id="getAllUserMap" resultType="Map">
+        SELECT id,userName,password,email,gender FROM user
+    </select>
+
+<!--    Map getUserByLike(@Param("portionStr") String portionStr)-->
+    <select id="getUserByLike" resultType="Map">
+       SELECT id,userName,password,email,gender FROM user WHERE userName LIKE "%"#{portionStr}"%"
+<!--          SELECT id,userName,password,email,gender FROM user WHERE userName LIKE CONCAT('%',#{portionStr},'%') -->
+<!--           SELECT id,userName,password,email,gender FROM user WHERE userName LIKE '%${portionStr}%' -->
+            </select>
+<!--    public int pachDeleteUser(@Param("ids") String ids)-->
+    <delete id="pachDeleteUser" parameterType="String" >
+        DELETE FROM user WHERE id IN (${ids});
+    </delete>
+<!--    int saveUserReturnKey(User user)-->
+    <insert id="saveUserReturnKey" parameterType="User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user VALUES(#{id},#{userName},#{password},#{email},#{gender})
+    </insert>
+        </mapper>
+
+

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ssm.dao.RoomMapper">
+<!--    Room getStuAndRoomByStepTwo(@Param("classId") int classId)-->
+    <select id="getStuAndRoomByStepTwo" resultType="Room">
+        select  * from room where class_id = #{classId}
+    </select>
+    <resultMap id="RoomAndStuByCollectionResultMap" type="Room">
+        <id column="class_id" property="classId"></id>
+        <result column="class_name" property="className"></result>
+        <collection property="students" ofType="Student">
+            <id column="stu_id" property="stuId"></id>
+            <result column="stu_name" property="stuName"></result>
+            <result column="stu_gender" property="stuGender"></result>
+            <result column="class_id" property="classId"></result>
+        </collection>
+    </resultMap>
+<!--    Room getRoomAndStuByCollection(@Param("classId") int classId)-->
+    <select id="getRoomAndStuByCollection" resultMap="RoomAndStuByCollectionResultMap">
+        select * from room as r
+        left join student as s
+        on r.class_id = s.class_id
+        where r.class_id = #{classId}
+    </select>
+    <resultMap id="RoomAndStuByStepResultMap" type="Room">
+        <id column="class_id" property="classId"></id>
+        <result column="class_name" property="className"></result>
+        <collection property="students"
+                    select="org.ssm.dao.StudentMapper.getRoomAndStuByStepTwo"
+                    column="class_id">
+        </collection>
+    </resultMap>
+<!--    Room getRoomAndStuByStepOne(@Param("classId") int classId)-->
+    <select id="getRoomAndStuByStepOne" resultMap="RoomAndStuByStepResultMap">
+        select * from room where class_id = #{classId}
+    </select>
+</mapper>

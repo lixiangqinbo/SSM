@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ssm.dao.StudentMapper">
+    <!--自定义映射-->
+    <resultMap id="stuResultMap" type="Student">
+        <id column="stu_id" property="stuId"></id>
+        <result column="stu_name" property="stuName"></result>
+        <result column="stu_gender" property="stuGender"></result>
+        <result column="class_id" property="classId"></result>
+    </resultMap>
+    <!--    resultMap:association多对一-->
+    <resultMap id="getStuAndClassByStepResultMap" type="Student" >
+        <id column="stu_id" property="stuId"></id>
+        <result column="stu_name" property="stuName"></result>
+        <result column="stu_gender" property="stuGender"></result>
+        <association select="org.ssm.dao.RoomMapper.getStuAndRoomByStepTwo"
+                     property="room"
+                     column="class_id"
+                     fetchType="lazy">
+        </association>
+    </resultMap>
+    <!--    resultMap:association多对一-->
+    <resultMap id="getStuAndClassResultMap" type="Student">
+        <id column="stu_id" property="stuId"></id>
+        <result column="stu_name" property="stuName"></result>
+        <result column="stu_gender" property="stuGender"></result>
+        <association property="room" javaType="Room">
+            <id column="class_id" property="classId"></id>
+            <result column="class_name" property="className"></result>
+        </association>
+    </resultMap>
+
+    <!--    Map getAllStudents()-->
+    <select id="getAllStudents" resultMap="stuResultMap">
+        select * from student
+    </select>
+    <!--    Student getStuAndClassById(@Param("stuId")int stuId)-->
+    <select id="getStuAndClassById" resultMap="getStuAndClassResultMap">
+        select * from
+        student left join room
+        on student.class_id = room.class_id
+        where student.stu_id = #{stuId}
+    </select>
+    <!--    int getStuAndRoomByStepOne(@Param("stuId") int stuId)-->
+    <select id="getStuAndRoomByStepOne" resultMap="getStuAndClassByStepResultMap">
+        select * from student where stu_id = #{stuId}
+    </select>
+<!--    Student getRoomAndStuByStepTwo(@Param("classId") int classId)-->
+    <select id="getRoomAndStuByStepTwo" resultType="Student">
+        select * from student where class_id = #{classId}
+    </select>
+    <sql id="columns">
+        stu_id,stu_name,stu_gender,class_id
+    </sql>
+<!--    List<Student> getStudenBySQL(@Param("student")Student student)-->
+    <select id="getStudenBySQL" resultType="Student">
+        select <include refid="columns"></include> from student
+<!--        <where>-->
+<!--            <if test="student.stuName !='' and student.stuName != null">-->
+<!--               and stu_name = #{student.stuName}-->
+<!--            </if>-->
+<!--            <if test="student.stuGender !='' and student.stuGender != null">-->
+<!--                and stu_gender = #{student.stuGender}-->
+<!--            </if>-->
+<!--        </where>-->
+<!--        <trim prefix="where" prefixOverrides="and">-->
+<!--            <if test="student.stuName !='' and student.stuName != null">-->
+<!--                and stu_name = #{student.stuName}-->
+<!--            </if>-->
+<!--            <if test="student.stuGender !='' and student.stuGender != null">-->
+<!--                and stu_gender = #{student.stuGender}-->
+<!--            </if>-->
+<!--        </trim>-->
+        <where>
+            <choose>
+                <when test="student.stuName !='' and student.stuName != null">
+                    and stu_name = #{student.stuName}
+                </when>
+                <when test="student.stuName !='' and student.stuName != null">
+                    and stu_gender = #{student.stuGender}
+                </when>
+                <otherwise>
+                    and 1=1
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+<!--    void saveStudents(@Param("stus")List<Student> stus)-->
+    <insert id="saveStudents" >
+        insert into student values
+       <foreach collection="stus" item="stu" separator=",">
+           (null ,#{stu.stuName},#{stu.stuGender},#{stu.classId})
+       </foreach>
+    </insert>
+<!--    void deleteStudents(@Param("ids")int[] ids)-->
+    <delete id="deleteStudents" >
+        delete from student where stu_id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
